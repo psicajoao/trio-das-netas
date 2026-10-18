@@ -642,6 +642,80 @@ var sfx={
   magnet:function(){[300,380,460,560,680,820].forEach(function(f,i){tone(f,i*.05,.14,'sawtooth',.08);});},
   over:function(){[392,330,262,196].forEach(function(f,i){tone(f,i*.16,.32,'triangle',.22);});}
 };
+
+/* ---------- música de fundo (sintetizada, sem arquivos) ---------- */
+var MUS={on:false,timer:null,step:0,next:0,gain:null,vol:.085,eighth:60/104/2};
+/* 8 compassos em Dó maior: C · Am · F · G · C · Am · F · G (8 colcheias por compasso) */
+var MUS_BASS=[130.81,110,87.31,98,130.81,110,87.31,98];
+var MUS_ARP=[[261.63,329.63,392],[220,261.63,329.63],[174.61,220,261.63],[196,246.94,293.66],[261.63,329.63,392],[220,261.63,329.63],[174.61,220,261.63],[196,246.94,293.66]];
+var MUS_MEL=[
+  [659.25,0,783.99,0,659.25,0,587.33,0],
+  [523.25,0,659.25,0,880,0,783.99,0],
+  [880,0,783.99,0,659.25,0,523.25,0],
+  [587.33,0,659.25,0,587.33,0,0,0],
+  [783.99,0,659.25,0,783.99,0,880,0],
+  [783.99,0,659.25,0,523.25,0,587.33,0],
+  [659.25,0,587.33,0,523.25,0,440,0],
+  [587.33,659.25,587.33,0,523.25,0,0,0]
+];
+var MUS_PAT=[0,1,2,1,0,1,2,1];
+function musNote(f,t,dur,type,vol){
+  var a=ac;if(!a||!MUS.gain)return;
+  var o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol,t+.02);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g);g.connect(MUS.gain);o.start(t);o.stop(t+dur+.03);
+}
+function musStep(n,t){
+  var bar=Math.floor(n/8)%8,i=n%8,e=MUS.eighth;
+  if(i===0)musNote(MUS_BASS[bar],t,e*3.6,'sine',.55);
+  if(i===4)musNote(MUS_BASS[bar]*1.5,t,e*3,'sine',.3);
+  musNote(MUS_ARP[bar][MUS_PAT[i]],t,e*1.6,'sine',.22);
+  var m=MUS_MEL[bar][i];
+  if(m)musNote(m,t,e*1.9,'triangle',.34);
+}
+function musTick(){
+  var a=ac;if(!a||!MUS.on)return;
+  if(MUS.next<a.currentTime-.2)MUS.next=a.currentTime+.05;
+  while(MUS.next<a.currentTime+.4){
+    musStep(MUS.step,MUS.next);
+    MUS.next+=MUS.eighth;MUS.step=(MUS.step+1)%64;
+  }
+}
+function musStart(){
+  if(muted||MUS.on||document.hidden)return;
+  var a=audio();if(!a)return;
+  if(!MUS.gain){
+    var lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2600;
+    MUS.gain=a.createGain();MUS.gain.gain.value=0.0001;
+    MUS.gain.connect(lp);lp.connect(a.destination);
+  }
+  MUS.on=true;
+  var t=a.currentTime;
+  MUS.gain.gain.cancelScheduledValues(t);
+  MUS.gain.gain.setValueAtTime(Math.max(.0001,MUS.gain.gain.value),t);
+  MUS.gain.gain.linearRampToValueAtTime(MUS.vol,t+.6);
+  MUS.next=t+.08;
+  MUS.timer=setInterval(musTick,120);
+  musTick();
+}
+function musStop(){
+  if(!MUS.on)return;
+  MUS.on=false;clearInterval(MUS.timer);MUS.timer=null;
+  var a=ac;
+  if(a&&MUS.gain){
+    var t=a.currentTime;
+    MUS.gain.gain.cancelScheduledValues(t);
+    MUS.gain.gain.setValueAtTime(Math.max(.0001,MUS.gain.gain.value),t);
+    MUS.gain.gain.linearRampToValueAtTime(.0001,t+.25);
+  }
+}
+window.__trioAudio={mus:MUS,ctx:function(){return ac;}};/* gancho só para testes */
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden)musStop();else if(G.running&&!muted)musStart();
+});
 function drawSoundBtn(){
   var b=$('btnSound');
   b.setAttribute('aria-pressed',muted?'false':'true');
@@ -751,8 +825,8 @@ function frame(ts){
   G.since+=dt*1000;
   if(G.since>=G.nextGap)trySpawn();
 }
-function pauseGame(){G.running=false;cancelAnimationFrame(G.raf);}
-function resumeGame(){G.running=true;G.last=performance.now();cancelAnimationFrame(G.raf);G.raf=requestAnimationFrame(frame);}
+function pauseGame(){G.running=false;cancelAnimationFrame(G.raf);musStop();}
+function resumeGame(){G.running=true;G.last=performance.now();cancelAnimationFrame(G.raf);G.raf=requestAnimationFrame(frame);musStart();}
 
 /* ---------- trio e cantinho ---------- */
 function buildTraySlots(){
@@ -1093,7 +1167,7 @@ function newGame(theme){
     audio();overlay.hidden=true;resumeGame();showPop('Nível '+G.level+'!');
   });
   $('btnHome').addEventListener('click',showStart);
-  $('btnSound').addEventListener('click',function(){muted=!muted;store('mute',muted?'1':'0');drawSoundBtn();audio();});
+  $('btnSound').addEventListener('click',function(){muted=!muted;store('mute',muted?'1':'0');drawSoundBtn();audio();if(muted)musStop();else if(G.running)musStart();});
   $('again').addEventListener('click',function(){audio();newGame(S.theme);});
   $('other').addEventListener('click',showStart);
   document.addEventListener('pointerdown',function(){audio();},{passive:true});

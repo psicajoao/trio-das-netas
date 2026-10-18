@@ -1,6 +1,6 @@
 // Trio das Netas: tudo que o jogo usa fica guardado no aparelho.
 // A versão muda sozinha quando qualquer arquivo muda; assim o iPad troca o cache antigo pelo novo.
-var V = 'trio-38e89b7ff0';
+var V = 'trio-98d790955e';
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png", "fonts/fredoka-500.woff2", "fonts/fredoka-600.woff2", "fonts/fredoka-700.woff2", "fonts/nunito-700.woff2", "fonts/nunito-800.woff2"];
 
 self.addEventListener('install', function (e) {
