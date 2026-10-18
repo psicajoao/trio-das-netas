@@ -187,6 +187,15 @@ h1,h2{margin:0;font:700 clamp(34px,7vmin,56px)/1.05 var(--font-display);text-wra
 .pv svg{width:34%;max-width:70px;height:auto}
 .nm{font:700 26px/1.1 var(--font-display)}
 .bs{font:800 14px var(--font-body);color:var(--ink-soft)}
+.vols{display:grid;gap:6px;max-width:420px;margin:16px auto 0}
+.vols label{display:flex;align-items:center;gap:12px;font:800 15px var(--font-body);color:var(--ink)}
+.vols span{width:68px;text-align:left}
+.vols input[type=range]{flex:1;min-width:0;height:38px;margin:0;background:transparent;-webkit-appearance:none;appearance:none;touch-action:pan-y}
+.vols input[type=range]::-webkit-slider-runnable-track{height:12px;border-radius:8px;background:linear-gradient(90deg,var(--accent) var(--p,50%),#CBD8EA var(--p,50%))}
+.vols input[type=range]::-moz-range-track{height:12px;border-radius:8px;background:#CBD8EA}
+.vols input[type=range]::-moz-range-progress{height:12px;border-radius:8px;background:var(--accent)}
+.vols input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:34px;height:34px;margin-top:-11px;border-radius:50%;background:#fff;border:4px solid var(--ink);box-shadow:0 2px 6px rgba(30,42,74,.3)}
+.vols input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--ink)}
 .seg{display:flex;justify-content:center;gap:10px;margin-top:18px;flex-wrap:wrap}
 .seg button{
   min-height:56px;padding:8px 20px;border-radius:18px;border:3px solid var(--line);background:#fff;
@@ -271,6 +280,10 @@ body{margin:0}
       <div class="seg" id="seg">
         <button data-d="easy" aria-pressed="true">Fácil<small>7 lugares e brilho de ajuda</small></button>
         <button data-d="normal" aria-pressed="false">Normal<small>5 lugares</small></button>
+      </div>
+      <div class="vols" id="vols">
+        <label><span>Música</span><input type="range" id="volM" min="0" max="100" step="1" aria-label="Volume da música"></label>
+        <label><span>Efeitos</span><input type="range" id="volS" min="0" max="100" step="1" aria-label="Volume dos efeitos"></label>
       </div>
       <p class="off" id="offStatus" role="status">Preparando para jogar sem internet…</p>
     </div>
@@ -615,18 +628,23 @@ function plural(n){return n+(n===1?' trio':' trios');}
 function after(ms,fn){var gid=G.gid;setTimeout(function(){if(gid===G.gid)fn();},ms);}
 
 /* ---------- som ---------- */
-var ac=null,muted=false;
+var ac=null,muted=false,VOL={m:70,s:80},silentEl=null;
 function audio(){
   if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){ac=null;}}
+  /* iPad: faz o som tocar mesmo com o botão lateral de silêncio ligado */
+  try{
+    if(navigator.audioSession){navigator.audioSession.type='playback';}
+    else if(!silentEl){silentEl=new Audio('data:audio/wav;base64,UklGRmQGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUAGAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA');silentEl.loop=true;silentEl.volume=.01;var pr=silentEl.play();if(pr&&pr.catch)pr.catch(function(){silentEl=null;});}
+  }catch(e){}
   if(ac&&ac.state==='suspended'){try{ac.resume();}catch(e){}}
   return ac;
 }
 function tone(f,delay,dur,type,vol){
-  var a=audio();if(!a||muted)return;
+  var a=audio();if(!a||muted||VOL.s<=0)return;
   var t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();
   o.type=type||'sine';o.frequency.setValueAtTime(f,t);
   g.gain.setValueAtTime(0.0001,t);
-  g.gain.exponentialRampToValueAtTime(vol||.15,t+.012);
+  g.gain.exponentialRampToValueAtTime(Math.max(.0002,(vol||.15)*VOL.s/80),t+.012);
   g.gain.exponentialRampToValueAtTime(.0001,t+dur);
   o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.03);
 }
@@ -644,7 +662,8 @@ var sfx={
 };
 
 /* ---------- música de fundo (sintetizada, sem arquivos) ---------- */
-var MUS={on:false,timer:null,step:0,next:0,gain:null,vol:.085,eighth:60/104/2};
+var MUS={on:false,timer:null,step:0,next:0,gain:null,eighth:60/104/2};
+function musLevel(){return Math.max(.0001,VOL.m/100*.3);}
 /* 8 compassos em Dó maior: C · Am · F · G · C · Am · F · G (8 colcheias por compasso) */
 var MUS_BASS=[130.81,110,87.31,98,130.81,110,87.31,98];
 var MUS_ARP=[[261.63,329.63,392],[220,261.63,329.63],[174.61,220,261.63],[196,246.94,293.66],[261.63,329.63,392],[220,261.63,329.63],[174.61,220,261.63],[196,246.94,293.66]];
@@ -684,19 +703,23 @@ function musTick(){
     MUS.next+=MUS.eighth;MUS.step=(MUS.step+1)%64;
   }
 }
-function musStart(){
-  if(muted||MUS.on||document.hidden)return;
-  var a=audio();if(!a)return;
+function musGain(a){
   if(!MUS.gain){
     var lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2600;
     MUS.gain=a.createGain();MUS.gain.gain.value=0.0001;
     MUS.gain.connect(lp);lp.connect(a.destination);
   }
+  return MUS.gain;
+}
+function musStart(){
+  if(muted||MUS.on||document.hidden)return;
+  var a=audio();if(!a)return;
+  musGain(a);
   MUS.on=true;
   var t=a.currentTime;
   MUS.gain.gain.cancelScheduledValues(t);
   MUS.gain.gain.setValueAtTime(Math.max(.0001,MUS.gain.gain.value),t);
-  MUS.gain.gain.linearRampToValueAtTime(MUS.vol,t+.6);
+  MUS.gain.gain.linearRampToValueAtTime(musLevel(),t+.6);
   MUS.next=t+.08;
   MUS.timer=setInterval(musTick,120);
   musTick();
@@ -716,6 +739,23 @@ window.__trioAudio={mus:MUS,ctx:function(){return ac;}};/* gancho só para teste
 document.addEventListener('visibilitychange',function(){
   if(document.hidden)musStop();else if(G.running&&!muted)musStart();
 });
+function paintVol(el){el.style.setProperty('--p',el.value+'%');}
+function initVolumes(){
+  var m=$('volM'),sl=$('volS');
+  m.value=VOL.m;sl.value=VOL.s;paintVol(m);paintVol(sl);
+  m.addEventListener('input',function(){
+    VOL.m=+m.value;paintVol(m);store('vol-m',VOL.m);
+    if(MUS.on&&MUS.gain&&ac)MUS.gain.gain.setValueAtTime(musLevel(),ac.currentTime);
+  });
+  m.addEventListener('change',function(){
+    /* ouvir como ficou: três notinhas da música */
+    var a=audio();if(!a||muted||MUS.on||VOL.m<=0)return;
+    var g=musGain(a);g.gain.cancelScheduledValues(a.currentTime);g.gain.setValueAtTime(musLevel(),a.currentTime);
+    var t=a.currentTime+.05;[523.25,659.25,783.99].forEach(function(f,i){musNote(f,t+i*.18,.4,'triangle',.5);});
+  });
+  sl.addEventListener('input',function(){VOL.s=+sl.value;paintVol(sl);store('vol-s',VOL.s);});
+  sl.addEventListener('change',function(){if(!muted)sfx.trio();});
+}
 function drawSoundBtn(){
   var b=$('btnSound');
   b.setAttribute('aria-pressed',muted?'false':'true');
@@ -1173,6 +1213,10 @@ function newGame(theme){
   document.addEventListener('pointerdown',function(){audio();},{passive:true});
   if(store('diff')==='normal')S.diff='normal';
   muted=store('mute')==='1';
+  var vm=parseInt(store('vol-m'),10),vs=parseInt(store('vol-s'),10);
+  if(vm>=0&&vm<=100)VOL.m=vm;
+  if(vs>=0&&vs<=100)VOL.s=vs;
+  initVolumes();
   drawSoundBtn();buildTools();
   if(window.ResizeObserver){new ResizeObserver(function(){metrics();buildBg();}).observe(field);}
   else{window.addEventListener('resize',function(){metrics();buildBg();});}
