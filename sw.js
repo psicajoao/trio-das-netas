@@ -1,7 +1,7 @@
-// Trio das Netas: tudo que o jogo usa fica guardado no aparelho.
+// BrincaTrio: tudo que o jogo usa fica guardado no aparelho.
 // A versão muda sozinha quando qualquer arquivo muda; assim o iPad troca o cache antigo pelo novo.
-var V = 'trio-2b35034a5b';
-var FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png", "fonts/fredoka-500.woff2", "fonts/fredoka-600.woff2", "fonts/fredoka-700.woff2", "fonts/nunito-700.woff2", "fonts/nunito-800.woff2"];
+var V = 'trio-7a11c02206';
+var FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png", "brincatrio_logo.svg", "fonts/fredoka-500.woff2", "fonts/fredoka-600.woff2", "fonts/fredoka-700.woff2", "fonts/nunito-700.woff2", "fonts/nunito-800.woff2"];
 
 self.addEventListener('install', function (e) {
   // addAll é tudo-ou-nada: se faltar um arquivo, esta versão não é instalada.

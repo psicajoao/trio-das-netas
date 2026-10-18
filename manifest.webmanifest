@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Trio das Netas",
-  "short_name": "Trio das Netas",
+  "name": "BrincaTrio",
+  "short_name": "BrincaTrio",
   "lang": "pt-BR",
   "description": "Jogo infantil de formar trios. Funciona sem internet.",
   "start_url": "./",
