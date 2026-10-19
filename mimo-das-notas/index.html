@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Mimo das Notas</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#79CDFF">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mimo">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- cenário (céu, nuvens, colinas) -->
+  <div id="scenery" aria-hidden="true">
+    <i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i>
+    <svg class="hills" viewBox="0 0 1000 200" preserveAspectRatio="none">
+      <path d="M0 90 C 140 20 300 30 450 85 C 600 140 760 30 1000 70 L1000 200 L0 200Z" fill="#7AD96B"/>
+      <path d="M0 130 C 180 70 340 110 520 120 C 700 130 850 80 1000 105 L1000 200 L0 200Z" fill="#5FCB5E"/>
+    </svg>
+  </div>
+
+  <!-- TELA INICIAL -->
+  <section id="home" class="screen">
+    <div class="home-box">
+      <img class="home-mimo" src="assets/mimo.png" alt="Mimo" draggable="false">
+      <div class="home-side">
+        <h1 class="title"><span>Mimo</span><small>das</small><span>Notas</span></h1>
+        <button id="btnPlay" class="btn big" type="button">JOGAR</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SELEÇÃO DE CLAVE E FASES -->
+  <section id="select" class="screen" hidden>
+    <header class="sel-top">
+      <button id="btnBack" class="btn round" type="button" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 4 L7 12 L15 20" fill="none" stroke="#FFFCF3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="tabs">
+        <button class="tab on" type="button">Clave de Sol</button>
+        <button class="tab off" type="button" disabled>Clave de Fá <em>em breve</em></button>
+      </div>
+      <button id="btnHelp" class="chip" type="button" aria-pressed="true">Cores de ajuda: <b>ligadas</b></button>
+    </header>
+    <div id="phaseGrid" class="phase-grid"></div>
+  </section>
+
+  <!-- JOGO -->
+  <section id="game" class="screen" hidden>
+    <header id="hud">
+      <div class="pill" id="hPhase">FASE 01</div>
+      <div class="pill" id="hScore">PONTOS 000</div>
+      <div class="pill" id="hErr">ERROS 0</div>
+      <div class="stars" id="hStars" aria-label="Estrelas possíveis">
+        <i class="st on">★</i><i class="st on">★</i><i class="st on">★</i>
+      </div>
+      <div class="hudmsg"><span id="prompt">Toque a tecla da nota</span><span id="count">0 / 0</span></div>
+      <button id="btnPause" class="btn round yellow" type="button" aria-label="Pausar"><i class="pbars"></i></button>
+    </header>
+    <main id="board">
+      <div id="staffPanel" class="panel">
+        <div id="staffBox"></div>
+        <div id="banner" class="banner"></div>
+      </div>
+      <aside id="side">
+        <div id="mimoPanel" class="panel"></div>
+        <div id="firePanel" class="panel"><span class="fl">FOGUEIRA DE ERROS</span><div id="flames"></div></div>
+      </aside>
+    </main>
+    <footer id="kb"></footer>
+  </section>
+
+  <!-- PAUSA -->
+  <div id="pause" class="overlay" hidden>
+    <div class="card">
+      <h2>Pausa</h2>
+      <button id="pContinue" class="btn big" type="button">CONTINUAR</button>
+      <div class="row">
+        <button id="pRestart" class="btn" type="button">Recomeçar</button>
+        <button id="pPhases" class="btn" type="button">Fases</button>
+      </div>
+      <div class="row">
+        <button id="pSound" class="chip" type="button">Som: <b>ligado</b></button>
+        <button id="pHelp" class="chip" type="button">Cores de ajuda: <b>ligadas</b></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="result" class="overlay" hidden>
+    <div class="card">
+      <h2 id="rTitle">Fase concluída!</h2>
+      <div id="rStars" class="rstars"><i>★</i><i>★</i><i>★</i></div>
+      <p id="rLine"></p>
+      <p id="rRule" class="rule"></p>
+      <div class="row">
+        <button id="rAgain" class="btn" type="button">Tentar de novo</button>
+        <button id="rNext" class="btn big" type="button">CONTINUAR</button>
+      </div>
+      <button id="rPhases" class="link" type="button">Ver todas as fases</button>
+    </div>
+  </div>
+
+  <div id="fx"></div>
+  <div id="rotate"><div><b>Gire o aparelho</b><br>O Mimo gosta de tela deitada.</div></div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
