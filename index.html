@@ -2122,6 +2122,8 @@ window.__bt={G:G,S:S,Rules:Rules,KALL:KALL,newGame:newGame,startLevel:startLevel
     };
     w.postMessage('status',[ch.port2]);
   }
+  var had=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){var o=document.getElementById('overlay');if(had&&!window.__rl&&o&&!o.hidden){window.__rl=1;location.reload();}});
   navigator.serviceWorker.register('sw.js').then(function(){return navigator.serviceWorker.ready;})
     .then(ask).catch(function(){say('Não foi possível preparar o modo sem internet.',false);});
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
