@@ -398,6 +398,36 @@ h2{font-size:clamp(32px,6.4vmin,52px)}
 #wait .slot.filled{background:radial-gradient(circle at 50% 28%,#fff 0,#DDF2FF 100%);border-color:#fff;box-shadow:0 5px 0 #2A72AE,0 9px 12px rgba(0,30,90,.35),inset 0 -4px 0 rgba(90,160,220,.25)}
 #waitBox.smash{box-shadow:0 7px 0 #2A72AE,0 0 0 6px rgba(255,122,26,.65),0 14px 20px rgba(0,30,90,.3)}
 
+/* abertura e entrada no mesmo mar noturno */
+html body #splash{background:radial-gradient(circle at 50% 22%,rgba(255,255,255,.9) 0 5%,rgba(200,225,255,.35) 9%,rgba(120,170,255,0) 30%),linear-gradient(180deg,#061A4C 0%,#0A3680 34%,#0B5FA8 70%,#093D78 100%)}
+#splash .sceneBot{filter:brightness(.6) saturate(.85);z-index:0}
+#splash .sceneTop{z-index:0}
+#splash .spl-rays{opacity:.7;z-index:0}
+#splash .spl-logo,#splash .spl-tap{z-index:2}
+.spl-fish{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.sfb{position:absolute;bottom:-18vmin;border-radius:50%;width:var(--s);height:var(--s);left:var(--x);
+  background:radial-gradient(circle at 50% 50%,rgba(205,242,255,.2) 0,rgba(205,242,255,.14) 60%,rgba(170,228,255,.42) 86%,rgba(255,255,255,.6) 100%);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.7),inset 0 0 14px 2px rgba(170,225,255,.5),0 0 16px 3px rgba(140,210,255,.5);
+  animation:sfup var(--d) linear infinite;animation-delay:var(--dl)}
+.sfb::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 29% 21%,rgba(255,255,255,.95) 0 3%,rgba(255,255,255,0) 10%)}
+.sfb .fi{position:absolute;left:19%;top:19%;width:62%;height:62%}
+@keyframes sfup{0%{transform:translate(0,0)}25%{transform:translate(14px,-28vh)}50%{transform:translate(-10px,-58vh)}75%{transform:translate(12px,-88vh)}100%{transform:translate(0,-125vh)}}
+@media (prefers-reduced-motion:reduce){.sfb{animation:none!important;bottom:20vmin}}
+#overlay{background:radial-gradient(circle at 50% 40%,rgba(10,40,110,.3),rgba(3,14,50,.62))}
+.panel{background:linear-gradient(rgba(22,78,150,.88),rgba(8,36,92,.94));border:4px solid rgba(175,225,255,.85);
+  box-shadow:0 0 28px 4px rgba(120,190,255,.45),0 24px 44px rgba(2,12,40,.55),inset 0 3px 0 rgba(255,255,255,.35),inset 0 -6px 0 rgba(0,20,70,.35)}
+.panel::before{content:"";position:absolute;left:6%;top:3%;width:22%;height:7%;border-radius:50%;background:radial-gradient(ellipse,rgba(255,255,255,.55),rgba(255,255,255,0));pointer-events:none}
+.how{color:#D3E9FC}.how b{color:#fff}
+.sub{color:#D3E9FC}
+.bs{color:#A9D4F5}
+.vols label{color:#E6F3FF}
+.seg button[aria-pressed="true"]{background:linear-gradient(#FFB04A,#FF7A1A);box-shadow:0 5px 0 var(--accent-dark),0 9px 12px rgba(0,0,0,.3),inset 0 3px 0 rgba(255,255,255,.5);color:#fff;text-shadow:0 2px 0 rgba(120,40,0,.4)}
+.seg button[aria-pressed="true"] small{color:#FFEAD1}
+.chips{gap:14px;margin:12px 0 6px}
+.chips .sfb{width:var(--s);height:var(--s);box-shadow:inset 0 0 0 2px rgba(255,255,255,.7),inset 0 0 14px 2px rgba(170,225,255,.5),0 0 16px 3px rgba(140,210,255,.5);position:relative;bottom:auto;left:auto;animation:chipbob 2.4s ease-in-out infinite alternate;--s:clamp(56px,10vmin,84px)}
+.chips .sfb:nth-child(2){animation-delay:-.8s}.chips .sfb:nth-child(3){animation-delay:-1.6s}
+@keyframes chipbob{from{transform:translateY(-4px)}to{transform:translateY(5px)}}
+
 /* 9) abertura animada com a logo oficial (arquivo brincatrio_logo.svg, sem alterações) */
 #splash{
   position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2.4vh,24px);
@@ -522,7 +552,7 @@ body{margin:0}
   <div id="overlay">
     <div class="panel" id="startPanel">
       <h1>BrincaTrio</h1>
-      <div class="chips" aria-hidden="true"><i style="background:#E5484D"></i><i style="background:#3B82F6"></i><i style="background:#FFC53D"></i></div>
+      <div class="chips" id="chips" aria-hidden="true"></div>
       <p class="how">Toque nos bichinhos das bolhas: eles vão para o <b>Cantinho</b>. Junte <b>3 iguais</b> para encher os <b>aquários</b> lá de cima! Se o Cantinho encher, acabou. Nas próximas fases chegam <b>brinquedos</b> e <b>carrinhos</b>!</p>
       <button class="btn primary" id="play">Jogar</button>
       <small class="bs" id="bestLine"></small>
@@ -1588,7 +1618,7 @@ function convFrame(ts){
   var changed=false,back=false;
   G.goals.forEach(function(g,i){
     if(g.done)return;
-    var near=G.tray.filter(function(e){return e.k===g.k;}).length>=2;
+    var near=g.n>=2;
     if(!g.away&&near)return;               /* quase completo: espera, não some */
     g.t-=dt;
     if(g.t<=0){
@@ -1603,8 +1633,9 @@ function convStart(){if(convRaf)return;convLast=performance.now();convRaf=reques
 function updateGoals(){
   G.goals.forEach(function(g,i){
     var el=goalsEl.children[i];if(!el)return;
-    var n=g.done?3:Math.min(3,G.tray.filter(function(e){return e.k===g.k;}).length);
-    var keep=el.classList.contains('back')?' back':'';el.className='goal th-'+KALL[g.k].theme+' n'+n+(g.shown?' done':'')+(g.away&&!g.done?' away':'')+keep;
+    var n=Math.min(3,g.landed);
+    var keep=el.classList.contains('back')?' back':'';
+    el.className='goal th-'+KALL[g.k].theme+' n'+n+(g.shown?' done':'')+(g.away&&!g.done?' away':'')+keep;
     el.querySelector('.gt b').textContent=n+'/3';
   });
 }
@@ -1624,11 +1655,16 @@ function renderTray(){
   waitBox.classList.toggle('warn',used>0&&G.cap-used<=1);
 }
 function updateHints(){
-  var on=S.diff==='easy'&&G.running,ks=on?Rules.hintKinds(trayKinds(),pendingKinds()):[];
+  var on=S.diff==='easy'&&G.running,ks=[];
+  if(on){
+    var bi=-1,bv=-1;
+    G.goals.forEach(function(g,i){if(!g.done&&!g.away&&g.n>bv){bv=g.n;bi=i;}});
+    if(bi!==-1)ks=[G.goals[bi].k];
+  }
   aliveFish().forEach(function(x){x.f.el.classList.toggle('hint',on&&ks.indexOf(x.f.kind)!==-1);});
 }
 function hud(){
-  var done=G.goals.filter(function(g){return g.done;}).length;
+  var done=G.goals.filter(function(g){return g.shown;}).length;
   $('score').textContent=G.score;$('level').textContent=G.level;$('best').textContent=Math.max(G.best,G.score);
   $('lvbar').style.width=(G.goals.length?Math.min(100,done/G.goals.length*100):0).toFixed(0)+'%';
   $('lvStat').title='Aquários cheios: '+done+' de '+G.goals.length;
@@ -1689,7 +1725,7 @@ function smash(i){
     h.remove();
     puff(r.left+r.width/2,r.top+r.height/2,[col,'#fff','#FFC53D'],14,90);
     renderTray();
-    if(Rules.needRespawn(kind,pendingKinds(),boardCount(kind),G.tray.filter(function(x){return x.k===kind;}).length)){
+    if(Rules.needRespawn(kind,pendingKinds(),boardCount(kind),G.tray.filter(function(x){return x.k===kind;}).length+goalN(kind))){
       respawnFish(kind);toast('Um bichinho voltou para o mar!');
     }
     renderTools();updateAll();checkTray();
@@ -1725,24 +1761,42 @@ function useSlot(){
   sfx.power();toast('Mais um lugar no Cantinho!');
   checkTray();
 }
-function undoOk(){var h=G.hist;return !!h&&G.tray.indexOf(h.entry)!==-1&&!h.entry.inc&&!h.entry.res;}
+function undoOk(){
+  var h=G.hist;if(!h)return false;
+  if(h.gi!==undefined){var g=G.goals[h.gi];return !!g&&!g.shown&&g.landed===g.n&&g.n>0;}
+  return G.tray.indexOf(h.entry)!==-1&&!h.entry.inc&&!h.entry.res;
+}
 function useUndo(){
   if(!undoOk()){toast('Não dá para voltar agora');sfx.nope();return;}
-  var h=G.hist,i=G.tray.indexOf(h.entry),from=trayEls[i].getBoundingClientRect();
-  G.tray.splice(i,1);G.tools.undo--;G.hist=null;
+  var h=G.hist,from,kind=h.f.kind;
+  if(h.gi!==undefined){
+    var g=G.goals[h.gi];from=goalsEl.children[h.gi].querySelector('.gc').getBoundingClientRect();
+    g.n--;g.landed--;g.done=false;
+  }else{
+    var i=G.tray.indexOf(h.entry);from=trayEls[i].getBoundingClientRect();G.tray.splice(i,1);
+  }
+  G.tools.undo--;G.hist=null;
   h.f.alive=true;h.b.gone=false;h.b.el.classList.remove('gone');
   var to=h.f.el.getBoundingClientRect();
   renderTray();sfx.power();renderTools();
-  fly(from,to,h.f.kind,function(){h.f.el.classList.remove('out');updateAll();});
+  fly(from,to,kind,function(){h.f.el.classList.remove('out');updateAll();});
   updateAll();
 }
 function useMagnet(){
-  var free=G.cap-G.tray.length,counts={},av=aliveFish();
+  var av=aliveFish(),counts={};
   av.forEach(function(x){counts[x.f.kind]=(counts[x.f.kind]||0)+1;});
-  var res=Rules.magnet(trayKinds(),counts,pendingKinds(),free);
-  if(!res){toast('Nada para puxar agora');sfx.nope();return;}
+  var best=-1,bv=-1;
+  G.goals.forEach(function(g,i){
+    if(g.done||g.away)return;
+    var need=3-g.n,have=counts[g.k]||0;
+    if(have<=0)return;
+    var v=g.n*10+(have>=need?5:0);
+    if(v>bv){bv=v;best=i;}
+  });
+  if(best===-1){toast('Nada para puxar agora');sfx.nope();return;}
+  var g0=G.goals[best],take=Math.min(3-g0.n,counts[g0.k]);
   G.tools.magnet--;sfx.magnet();showPop('Ímã!');renderTools();
-  var list=av.filter(function(x){return x.f.kind===res.kind;}).slice(0,res.take);
+  var list=av.filter(function(x){return x.f.kind===g0.k;}).slice(0,take);
   list.forEach(function(x,k){after(k*170,function(){pickFish(x.b,x.f,true);});});
 }
 function award(list){list.forEach(function(g){G.tools[g.id]=Math.min(9,G.tools[g.id]+1);});}
@@ -1768,24 +1822,42 @@ function insertIdx(kind){
   var last=-1;G.tray.forEach(function(e,i){if(e.k===kind&&!e.res)last=i;});
   return last===-1?G.tray.length:last+1;
 }
+function goalIndexFor(kind){
+  for(var i=0;i<G.goals.length;i++){var g=G.goals[i];if(g.k===kind&&!g.done&&!g.away&&g.n<3)return i;}
+  return -1;
+}
+function goalN(kind){var n=0;G.goals.forEach(function(g){if(g.k===kind)n+=g.n;});return n;}
 function pickFish(b,f,force){
   if(!G.running||G.over||(G.busy&&!force)||!f.alive)return false;
   audio();
   if(G.armed)disarm();
-  if(G.tray.length>=G.cap){
+  var kind=f.kind,r=f.el.getBoundingClientRect();
+  var gi=goalIndexFor(kind);
+  if(gi===-1&&G.tray.length>=G.cap){
     sfx.nope();toast('O Cantinho está cheio!');
     waitBox.classList.remove('shake');void waitBox.offsetWidth;waitBox.classList.add('shake');
     return false;
   }
-  var kind=f.kind;
-  var isNew=!force&&pendingKinds().indexOf(kind)===-1&&!G.tray.some(function(e){return e.k===kind&&!e.res;});
-  var r=f.el.getBoundingClientRect();
   f.alive=false;f.el.classList.add('out');
+  var emptied=!b.fish.some(function(x){return x.alive;});
+  if(emptied){b.gone=true;b.el.classList.add('gone');}
+  if(gi!==-1){
+    /* bichinho da meta: vai direto para o aquário */
+    var g=G.goals[gi];g.n++;
+    G.hist={b:b,f:f,gi:gi};
+    if(g.n>=3)g.done=true;
+    sfx.catchIt(g.n);
+    updateAll();
+    var to=goalsEl.children[gi].querySelector('.gc').getBoundingClientRect();
+    fly(r,to,kind,function(){g.landed++;updateGoals();if(g.landed>=3)goalComplete(gi);},(to.width*.5)/r.width);
+    return true;
+  }
+  /* não é meta agora: vai para o Cantinho (é um "errado") */
+  var isNew=!force&&pendingKinds().indexOf(kind)===-1&&!G.tray.some(function(e){return e.k===kind&&!e.res;});
   var idx=insertIdx(kind),entry={id:++G.uid,k:kind,inc:true,res:false};
   G.tray.splice(idx,0,entry);
   if(isNew)G.errs++;
   G.hist={b:b,f:f,entry:entry};
-  if(!b.fish.some(function(x){return x.alive;})){b.gone=true;b.el.classList.add('gone');}
   sfx.catchIt(Math.min(3,G.tray.filter(function(e){return e.k===kind;}).length));
   renderTray();updateAll();
   fly(r,trayEls[idx].getBoundingClientRect(),kind,function(){
@@ -1794,10 +1866,29 @@ function pickFish(b,f,force){
   });
   return true;
 }
+/* bichinhos que estavam esperando no Cantinho porque o aquário deles estava fora da vez */
+function flushToGoals(){
+  G.goals.forEach(function(g,gi){
+    if(g.done||g.away)return;
+    var moved=false;
+    for(var i=0;i<G.tray.length&&g.n<3;){
+      var e=G.tray[i];
+      if(e.k===g.k&&!e.inc&&!e.res){
+        var from=trayEls[i].getBoundingClientRect();
+        G.tray.splice(i,1);g.n++;moved=true;
+        if(g.n>=3)g.done=true;
+        var to=goalsEl.children[gi].querySelector('.gc').getBoundingClientRect();
+        fly(from,to,e.k,function(){g.landed++;updateGoals();if(g.landed>=3)goalComplete(gi);},(to.width*.5)/from.width);
+      }else i++;
+    }
+    if(moved){renderTray();updateAll();}
+  });
+}
 function checkTray(){
   if(G.over||G.busy)return;
-  var counts={},k=null;
-  G.tray.forEach(function(e){if(e.inc||e.res)return;counts[e.k]=(counts[e.k]||0)+1;if(counts[e.k]>=3&&k===null&&!lockedKind(e.k))k=e.k;});
+  flushToGoals();
+  var pend=pendingKinds(),counts={},k=null;
+  G.tray.forEach(function(e){if(e.inc||e.res)return;counts[e.k]=(counts[e.k]||0)+1;if(counts[e.k]>=3&&k===null&&pend.indexOf(e.k)===-1)k=e.k;});
   if(k!==null){resolveTrio(k);return;}
   maybeLose();
 }
@@ -1805,51 +1896,41 @@ function maybeLose(){
   if(G.over||G.busy)return;
   if(G.tray.length<G.cap)return;
   if(G.tray.some(function(e){return e.inc||e.res;}))return;
+  var pend=pendingKinds();
+  if(G.tray.some(function(e){return pend.indexOf(e.k)!==-1;}))return; /* o aquário volta já, já */
   if(Rules.triple(G.tray.map(function(e){return e.k;}))!==null)return;
   if(G.tools.hammer>0||G.tools.slot>0||(G.tools.undo>0&&undoOk())){toast('Cantinho cheio! Use um poder.');return;}
   lose();
 }
+/* três iguais que não eram meta: somem do Cantinho */
 function resolveTrio(kind){
   var ents=G.tray.filter(function(e){return e.k===kind&&!e.inc&&!e.res;}).slice(0,3);
   ents.forEach(function(e){e.res=true;});
-  var gi=-1;G.goals.forEach(function(g,i){if(gi===-1&&g.k===kind&&!g.done)gi=i;});
-  var isGoal=gi!==-1;
-  if(isGoal)G.goals[gi].done=true;
-  G.score++;
-  if(G.score>G.best){G.best=G.score;}
-  var gained=[];
-  if(isGoal){
-    if(G.errs===0)G.streak++;else G.streak=0;
-    G.errs=0;
-    if(G.streak>=3){G.streak=0;gained.push({id:Rules.randomTool(Math.random())});award(gained);}
-  }
-  var allDone=G.goals.every(function(g){return g.done;});
-  if(allDone)G.busy=true;
-  sfx.trio();if(isGoal)showPop('Trio!');
+  G.score++;if(G.score>G.best)G.best=G.score;
+  sfx.trio();
   renderTray();hud();
   after(420,function(){
     var rects=ents.map(function(e){var i=G.tray.indexOf(e);return trayEls[i].getBoundingClientRect();});
     G.tray=G.tray.filter(function(e){return ents.indexOf(e)===-1;});
     renderTray();
-    if(isGoal){
-      var gel=goalsEl.children[gi],to=gel.querySelector('.gc').getBoundingClientRect(),n=0;
-      rects.forEach(function(rc,j){
-        after(j*70,function(){
-          var to=gel.querySelector('.gc').getBoundingClientRect();
-          fly(rc,to,kind,function(){
-            n++;
-            if(n===3){G.goals[gi].shown=true;updateGoals();var t2=gel.querySelector('.gc').getBoundingClientRect();puff(t2.left+t2.width/2,t2.top+t2.height/2,PARTY,16,90);}
-          },(to.width*.55)/rc.width);
-        });
-      });
-    }else{
-      rects.forEach(function(rc){puff(rc.left+rc.width/2,rc.top+rc.height/2,[KALL[kind].hex,'#fff','#FFC53D'],8,70);});
-    }
-    renderTools(gained);updateAll();
-    if(gained.length){sfx.award();toast('3 trios sem errar! Você ganhou: '+TOOLS[gained[0].id].name);}
-    if(allDone){after(1100,levelWin);}
-    else checkTray();
+    rects.forEach(function(rc){puff(rc.left+rc.width/2,rc.top+rc.height/2,[KALL[kind].hex,'#fff','#FFC53D'],8,70);});
+    updateAll();checkTray();
   });
+}
+/* aquário cheio */
+function goalComplete(gi){
+  var g=G.goals[gi];g.shown=true;
+  G.score++;if(G.score>G.best)G.best=G.score;
+  var gained=[];
+  if(G.errs===0)G.streak++;else G.streak=0;
+  G.errs=0;
+  if(G.streak>=3){G.streak=0;gained.push({id:Rules.randomTool(Math.random())});award(gained);}
+  sfx.trio();showPop('Trio!');
+  var t2=goalsEl.children[gi].querySelector('.gc').getBoundingClientRect();
+  puff(t2.left+t2.width/2,t2.top+t2.height/2,PARTY,18,100);
+  renderTools(gained);updateAll();
+  if(gained.length){sfx.award();toast('3 sem errar! Você ganhou: '+TOOLS[gained[0].id].name);}
+  if(G.goals.every(function(x){return x.shown;})){G.busy=true;after(1100,levelWin);}
 }
 function levelWin(){
   if(G.over)return;
@@ -1927,7 +2008,7 @@ function startLevel(){
   var pool=Rules.pool(G.level,G.order),th=Rules.introTheme(G.level),
       intro=th?G.order[th].slice(0,Rules.poolSizes(G.level)[th]):null;
   var bd=Rules.makeBoard(G.level,pool,Math.random,intro);
-  G.goals=bd.goals.map(function(k){return {k:k,done:false,shown:false};});
+  G.goals=bd.goals.map(function(k){return {k:k,done:false,shown:false,n:0,landed:0};});
   var pos=0;
   bd.sizes.forEach(function(sz){G.bubbles.push(makeBubble(bd.fish.slice(pos,pos+sz),Math.random()*.35));pos+=sz;});
   metrics();layoutBoard();buildGoals();buildSlots();renderTray();renderTools();updateAll();
@@ -1959,8 +2040,24 @@ function onResize(){
     if(Math.abs(M.w-G.lw)/G.lw>.05||Math.abs(M.h-G.lh)/G.lh>.05)layoutBoard();
   },120);
 }
+function bubbleOf(k,cls,style){return '<i class="sfb '+(cls||'')+'" style="'+(style||'')+'">'+kindHtml(k)+'</i>';}
+function decorate(){
+  var ch=$('chips');
+  if(ch)ch.innerHTML=bubbleOf(KINDS.fish[0])+bubbleOf(KINDS.toy[4])+bubbleOf(KINDS.car[0]);
+  var sp=$('splash');
+  if(sp&&!sp.hidden){
+    var h='<div class="spl-fish">',i,pool=KALL.filter(function(k){return k.theme==='fish';});
+    for(i=0;i<7;i++){
+      var k=pool[(i*5+2)%pool.length],sz=54+Math.random()*50;
+      h+=bubbleOf(k,'','--s:'+sz.toFixed(0)+'px;--x:'+(6+i*13+Math.random()*6).toFixed(0)+'%;--d:'+(11+Math.random()*7).toFixed(1)+'s;--dl:-'+(Math.random()*14).toFixed(1)+'s');
+    }
+    sp.insertAdjacentHTML('afterbegin',h+'</div>');
+  }
+}
 (function init(){
   bakeAll();
+  var sp0=$('splash');if(sp0)sp0.insertAdjacentHTML('afterbegin',scFish());
+  whenReady(decorate);
   $('play').addEventListener('click',function(){audio();whenReady(newGame);});
   $('seg').addEventListener('click',function(e){
     var b=e.target.closest('button');if(!b)return;
