@@ -1,7 +1,7 @@
 // BrincaTrio: tudo que o jogo usa fica guardado no aparelho.
 // A versão muda sozinha quando qualquer arquivo muda; assim o iPad troca o cache antigo pelo novo.
-var V = 'trio-f05ad6e956';
-var FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png", "brincatrio_logo.svg", "fonts/fredoka-500.woff2", "fonts/fredoka-600.woff2", "fonts/fredoka-700.woff2", "fonts/nunito-700.woff2", "fonts/nunito-800.woff2"];
+var V = 'trio-6ba196b87d';
+var FILES = ["./", "index.html", "manifest.webmanifest", "icon-180-noite.png", "icon-192-noite.png", "icon-512-noite.png", "brincatrio_logo.svg", "fonts/fredoka-500.woff2", "fonts/fredoka-600.woff2", "fonts/fredoka-700.woff2", "fonts/nunito-700.woff2", "fonts/nunito-800.woff2"];
 
 self.addEventListener('install', function (e) {
   // addAll é tudo-ou-nada: se faltar um arquivo, esta versão não é instalada.
